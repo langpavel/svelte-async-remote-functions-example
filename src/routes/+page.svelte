@@ -1,17 +1,21 @@
 <script lang="ts">
 	import { addTodo, deleteTodo, getTodos, toggleTodo } from './todos.remote';
+
+	const todos = getTodos();
 </script>
 
 <main>
 	<h1>Todo App</h1>
 	<form
-		{...addTodo.enhance(async ({ submit, data }) => {
-			const text = data.get('text')?.toString().trim();
-			getTodos.override((todos) => [...todos, { id: 0, text, done: false }]);
-			const { apply } = await submit();
-			apply();
-			// this was we only refresh the list of todos, and no other queries on the page
-			getTodos.refresh();
+		{...addTodo.enhance(({ submit, data, form }) => {
+			const text = data.get('text')!.toString().trim();
+			todos.optimistic(
+				(todos) => [...todos, { id: 0, text, done: false }],
+				async () => {
+					const { apply } = await submit();
+					apply();
+				}
+			);
 		})}
 	>
 		<input type="text" name="text" placeholder="Add a new todo" autocomplete="off" />
@@ -19,39 +23,31 @@
 	</form>
 
 	<ul>
-		{#each await getTodos() as todo}
+		{#each await todos as todo}
 			<li class={{ pending: todo.id === 0 }}>
 				<label>
 					<input
 						type="checkbox"
 						checked={todo.done}
-						onchange={async () => {
+						onchange={() => {
 							// Normally you should make this a form, too, but we want to showcase using commands here
 							// TODO this doesn't always work right away yet, specifically when spamming because then
 							// a query refresh is pending which the override is then waiting on. We might need to make that logic smarter
-							getTodos.override((todos) =>
-								todos.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t))
+							todos.optimistic(
+								(todos) => todos.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t)),
+								() => toggleTodo(todo.id)
 							);
-							try {
-								await toggleTodo(todo.id);
-							} finally {
-								// this was we only refresh the list of todos, and no other queries on the page
-								getTodos.refresh();
-							}
 						}}
 					/>
 					<span class={{ done: todo.done }}>{todo.text}</span>
 				</label>
 				<button
-					onclick={async () => {
+					onclick={() => {
 						// Normally you should make this a form, too, but we want to showcase using commands here
-						getTodos.override((todos) => todos.filter((t) => t.id !== todo.id));
-						try {
-							await deleteTodo(todo.id);
-						} finally {
-							// this was we only refresh the list of todos, and no other queries on the page
-							getTodos.refresh();
-						}
+						todos.optimistic(
+							(todos) => todos.filter((t) => t.id !== todo.id),
+							() => deleteTodo(todo.id)
+						);
 					}}>Delete</button
 				>
 			</li>

@@ -17,7 +17,7 @@ export const getTodos = query(async () => {
 	return todos;
 });
 
-export const addTodo = form((data) => {
+export const addTodo = form(async (data) => {
 	const text = data.get('text') as string;
 	if (!text) {
 		return 'Todo text cannot be empty.';
@@ -28,17 +28,23 @@ export const addTodo = form((data) => {
 		text,
 		done: false
 	});
+
+	await getTodos().refresh();
 });
 
-export const toggleTodo = command((id: number) => {
+export const toggleTodo = command(async (id: number) => {
 	const todo = todos.find((t) => t.id === id);
 	if (!todo) error(404, 'Todo not found');
 
 	todo.done = !todo.done;
+
+	await getTodos().refresh();
 });
 
-export const deleteTodo = command((id: number) => {
+export const deleteTodo = command(async (id: number) => {
 	const index = todos.findIndex((t) => t.id === id);
 	if (index === -1) error(404, 'Todo not found');
 	todos.splice(index, 1);
+
+	await getTodos().refresh();
 });
