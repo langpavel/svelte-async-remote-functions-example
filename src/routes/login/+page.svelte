@@ -2,6 +2,8 @@
 	import { login } from './login.remote';
 </script>
 
+<a href="/">Go to Home</a>
+
 <!-- spreads method=post, onsubmit={handleToNotDoFullPageReload} and action="the login remote form function id" onto the form -->
 <form {...login}>
 	<label for="passphrase">Enter the passphrase "Svelte":</label>

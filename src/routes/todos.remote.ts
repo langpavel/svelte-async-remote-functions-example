@@ -2,18 +2,12 @@ import { command, form, query } from '$app/server';
 import { error } from '@sveltejs/kit';
 import { checkLoggedIn } from './login/login.remote';
 
-let todos: Array<{ id: number; text: string; done: boolean }> = [];
+let todos: Array<{ id: string; text: string; done: boolean }> = [];
 
 export const getTodos = query(async () => {
 	// TODO this doesn't work yet, needs some stuff fixed in the async branch
-	// await checkLoggedIn();
+	await checkLoggedIn();
 
-	// Simulate a long running operation to showcase optimistic UI updates,
-	// but only once we have at least one todo, to not make people think
-	// that Svelte(Kit) is slow.
-	if (todos.length > 0) {
-		await new Promise((resolve) => setTimeout(resolve, 2000));
-	}
 	return todos;
 });
 
@@ -24,7 +18,7 @@ export const addTodo = form(async (data) => {
 	}
 
 	todos.push({
-		id: Date.now(),
+		id: crypto.randomUUID(),
 		text,
 		done: false
 	});
@@ -32,19 +26,22 @@ export const addTodo = form(async (data) => {
 	await getTodos().refresh();
 });
 
-export const toggleTodo = command(async (id: number) => {
+export const toggleTodo = command(async (id: string) => {
 	const todo = todos.find((t) => t.id === id);
 	if (!todo) error(404, 'Todo not found');
 
-	todo.done = !todo.done;
+	// Simulate a long running operation to showcase optimistic UI updates
+	await new Promise((resolve) => setTimeout(resolve, 2000));
 
-	await getTodos().refresh();
+	todo.done = !todo.done;
 });
 
-export const deleteTodo = command(async (id: number) => {
+export const deleteTodo = form(async (data) => {
+	const id = data.get('id') as string;
 	const index = todos.findIndex((t) => t.id === id);
 	if (index === -1) error(404, 'Todo not found');
-	todos.splice(index, 1);
 
-	await getTodos().refresh();
+	if (Math.random() < 0.2) error(500, 'Random error occurred while deleting todo');
+
+	todos.splice(index, 1);
 });
