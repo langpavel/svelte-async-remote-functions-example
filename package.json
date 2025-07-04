@@ -22,15 +22,16 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
-		"vite": "^6.2.6"
+		"vite": "^6.2.6",
+		"zod": "^3.25.73"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"esbuild"
 		],
 		"overrides": {
-			"svelte": "https://pkg.pr.new/svelte@15844",
-			"@sveltejs/kit": "TODO override this with your local sveltekit version of the rpc-ssr-2 branch"
+			"svelte": "TODO add override here",
+			"@sveltejs/kit": "TODO add override here"
 		}
 	}
 }

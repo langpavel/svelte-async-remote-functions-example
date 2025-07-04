@@ -31,7 +31,7 @@
 		list-style: none;
 		padding: 0;
 		max-width: 400px;
-		margin: 2rem auto;
+		margin: 10rem auto;
 		padding: 1rem;
 	}
 	li {

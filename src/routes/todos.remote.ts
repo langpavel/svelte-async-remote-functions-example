@@ -1,5 +1,6 @@
 import { command, form, query } from '$app/server';
 import { error } from '@sveltejs/kit';
+import z from 'zod';
 import { checkLoggedIn } from './login/login.remote';
 
 let todos: Array<{ id: string; text: string; done: boolean }> = [];
@@ -26,12 +27,12 @@ export const addTodo = form(async (data) => {
 	await getTodos().refresh();
 });
 
-export const toggleTodo = command(async (id: string) => {
+export const toggleTodo = command(z.string(), async (id) => {
 	const todo = todos.find((t) => t.id === id);
 	if (!todo) error(404, 'Todo not found');
 
 	// Simulate a long running operation to showcase optimistic UI updates
-	await new Promise((resolve) => setTimeout(resolve, 2000));
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 
 	todo.done = !todo.done;
 });

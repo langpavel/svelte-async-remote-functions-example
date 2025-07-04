@@ -4,24 +4,14 @@
 	const todos = getTodos();
 
 	$effect(() => {
-		console.log('Todos updated:', todos.current?.length);
+		console.log('Todos updated:', console.log(JSON.stringify(todos.current)));
 	});
-	// $inspect(todos.current).with(console.trace);
 </script>
 
 <main>
 	<h1>Todo App</h1>
-	<form
-		{...addTodo.enhance(async ({ submit, data }) => {
-			const text = data.get('text')!.toString().trim();
-			const release = await todos.override((todos) => [...todos, { id: '0', text, done: false }]);
-			try {
-				await submit();
-			} finally {
-				release();
-			}
-		})}
-	>
+	<!-- by spreading onto the form you get an auto-enhanced form as soon as JS is available -->
+	<form {...addTodo}>
 		<input type="text" name="text" placeholder="Add a new todo" autocomplete="off" />
 		<button type="submit">Add</button>
 	</form>
@@ -38,16 +28,15 @@
 						checked={todo.done}
 						onchange={async () => {
 							// Normally you should make this a form, too, but we want to showcase using commands here
-							const release = await todos.override((todos) =>
-								todos.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t))
+
+							// By using `.updates(...)` we can update the local state optimistically and tell the server to refresh the state
+							// on the server and return it in the same request (single flight mutation).
+							// `.updates(...)` is also available for form submit functions (e.g. `submit().updates(...)`)
+							await toggleTodo(todo.id).updates(
+								todos.withOverride((todos) =>
+									todos.map((t) => (t.id === todo.id ? { ...t, done: !t.done } : t))
+								)
 							);
-							try {
-								await toggleTodo(todo.id);
-								// For showcasing purposes toggleTodo does not do a single flight mutation, so we refresh on the client
-								await todos.refresh();
-							} finally {
-								release();
-							}
 						}}
 					/>
 					<span class={{ done: todo.done }}>{todo.text}</span>
@@ -55,15 +44,13 @@
 
 				<form
 					{...remove.enhance(async ({ submit }) => {
-						const release = await todos.override((todos) => todos.filter((t) => t.id !== todo.id));
 						try {
 							await submit();
 						} catch {
 							// We catch the error to not show the nearest error page, instead we show the error inline
 						} finally {
-							// neither the server side nor the client side refresh will update the todos,
+							// neither the server side nor the client side will update the todos via a targeted refresh,
 							// so you can see in the network tab that everything is refreshed by default
-							release();
 						}
 					})}
 				>
@@ -77,7 +64,7 @@
 	<!-- <hr />
 	<ul>
 		{#each todos?.current ?? [] as todo}
-			<li class={{ pending: todo.id === 0 }}>
+			<li class={{ pending: todo.id === '0' }}>
 				<span class={{ done: todo.done }}>{todo.text}</span>
 
 				<button>Delete</button>
@@ -98,7 +85,6 @@
 	form {
 		display: flex;
 		gap: 0.5rem;
-		margin-bottom: 1rem;
 	}
 	input[type='text'] {
 		flex: 1;
@@ -135,6 +121,10 @@
 	.done {
 		text-decoration: line-through;
 		color: #888;
+	}
+	.error {
+		color: red;
+		align-content: center;
 	}
 	label {
 		flex: 1;
