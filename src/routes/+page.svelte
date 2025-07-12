@@ -60,17 +60,6 @@
 			</li>
 		{/each}
 	</ul>
-
-	<!-- <hr />
-	<ul>
-		{#each todos?.current ?? [] as todo}
-			<li class={{ pending: todo.id === '0' }}>
-				<span class={{ done: todo.done }}>{todo.text}</span>
-
-				<button>Delete</button>
-			</li>
-		{/each}
-	</ul> -->
 </main>
 
 <style>
