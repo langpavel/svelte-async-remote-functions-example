@@ -3,3 +3,8 @@
 @plugin "@tailwindcss/typography";
 
 @config "../tailwind.config.js";
+
+/* Ensure body has proper background */
+body {
+  @apply bg-gray-50 dark:bg-gray-900;
+}

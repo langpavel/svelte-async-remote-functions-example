@@ -10,8 +10,7 @@
       (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
   });
 
-  function toggleTheme() {
-    isDark = !isDark;
+  const updateTheme = () => {
     localStorage.setItem("theme", isDark ? "dark" : "light");
     const cl = document.documentElement.classList;
     if (isDark) {
@@ -19,7 +18,16 @@
     } else {
       cl.remove("dark");
     }
-  }
+  };
+
+  const toggleTheme = () => {
+    isDark = !isDark;
+  };
+
+  $effect(() => {
+    isDark;
+    updateTheme();
+  });
 </script>
 
 <button

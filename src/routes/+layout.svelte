@@ -6,14 +6,13 @@
   let { children } = $props();
 </script>
 
-<header
-  class="flex items-center justify-between border-b border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
->
-  <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Todo App</h1>
-  <ThemeToggle />
-</header>
+<div class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+  <header class="flex items-center justify-between border-b border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+    <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Todo App</h1>
+    <ThemeToggle />
+  </header>
 
-<main class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <main class="flex-1 bg-gray-50 dark:bg-gray-900">
   <svelte:boundary>
     {@render children()}
 
@@ -39,11 +38,10 @@
     {/snippet}
 
     {#snippet failed(e)}
-      <p
-        class="mx-auto mt-6 max-w-sm p-4 text-center text-sm font-semibold text-red-600 dark:text-red-400"
-      >
+      <p class="mx-auto mt-6 max-w-sm p-4 text-center text-sm font-semibold text-red-600 dark:text-red-400">
         {isHttpError(e) ? e.body.message : "Internal Error"}
       </p>
     {/snippet}
   </svelte:boundary>
-</main>
+  </main>
+</div>
