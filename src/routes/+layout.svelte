@@ -1,69 +1,49 @@
 <script>
   import "../app.css";
   import { isHttpError } from "@sveltejs/kit";
+  import ThemeToggle from "$lib/ThemeToggle.svelte";
 
   let { children } = $props();
 </script>
 
-<svelte:boundary>
-  {@render children()}
+<header
+  class="flex items-center justify-between border-b border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+>
+  <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Todo App</h1>
+  <ThemeToggle />
+</header>
 
-  {#snippet pending()}
-    <ul>
-      {#each Array(3)}
-        <li class="pending">
-          <label>
-            <input type="checkbox" disabled />
-            <span class="skeleton skeleton-text"></span>
-          </label>
-          <button disabled class="skeleton skeleton-btn">Delete</button>
-        </li>
-      {/each}
-    </ul>
-  {/snippet}
+<main class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <svelte:boundary>
+    {@render children()}
 
-  {#snippet failed(e)}
-    <p class="error">{isHttpError(e) ? e.body.message : "Internal Error"}</p>
-  {/snippet}
-</svelte:boundary>
+    {#snippet pending()}
+      <ul class="mx-auto mt-6 max-w-sm space-y-1 p-4">
+        {#each Array(3)}
+          <li
+            class="pointer-events-none flex items-center justify-between border-b border-gray-200 px-2 py-2 opacity-50 last:border-b-0 dark:border-gray-700"
+          >
+            <label class="flex flex-1 items-center gap-2">
+              <input
+                type="checkbox"
+                disabled
+                class="h-3.5 w-3.5 rounded border-gray-300 bg-white text-blue-600 dark:border-gray-600 dark:bg-gray-700"
+              />
+              <span class="h-3.5 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></span>
+            </label>
+            <button disabled class="h-5 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            ></button>
+          </li>
+        {/each}
+      </ul>
+    {/snippet}
 
-<style>
-  ul {
-    list-style: none;
-    padding: 0;
-    max-width: 400px;
-    margin: 10rem auto;
-    padding: 1rem;
-  }
-  li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-  }
-  .skeleton {
-    background: #eee;
-    border-radius: 4px;
-    display: inline-block;
-  }
-  .skeleton-text {
-    width: 120px;
-    height: 1em;
-    margin-left: 0.5em;
-  }
-  .skeleton-btn {
-    width: 50px;
-    height: 2em;
-    margin-left: 1em;
-  }
-  .pending {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  .error {
-    color: red;
-    font-weight: bold;
-  }
-</style>
+    {#snippet failed(e)}
+      <p
+        class="mx-auto mt-6 max-w-sm p-4 text-center text-sm font-semibold text-red-600 dark:text-red-400"
+      >
+        {isHttpError(e) ? e.body.message : "Internal Error"}
+      </p>
+    {/snippet}
+  </svelte:boundary>
+</main>
