@@ -1,4 +1,5 @@
 <script>
+  import "../app.css";
   import { isHttpError } from "@sveltejs/kit";
 
   let { children } = $props();
