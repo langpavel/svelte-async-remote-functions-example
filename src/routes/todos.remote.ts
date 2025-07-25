@@ -1,6 +1,6 @@
 import { command, form, query } from '$app/server';
 import { error } from '@sveltejs/kit';
-import z from 'zod';
+import z from 'zod/v4';
 import { checkLoggedIn } from './login/login.remote';
 
 let todos: Array<{ id: string; text: string; done: boolean }> = [];
